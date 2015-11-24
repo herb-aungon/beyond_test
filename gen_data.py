@@ -7,14 +7,14 @@ from sqlalchemy.sql import select
 
 resp = {"success":False, "message":None}
 
-# try:
-#     create_db = create_engine('mysql+pymysql://root:test@localhost/', echo=True)
-#     create_db.execute("CREATE DATABASE beyond_db")
-#     resp['success']=True
-#     resp['message']="DB created"
-# except Exception as e:
-#     resp['message']="Failed to create! %s" % e
-#     print resp
+try:
+    create_db = create_engine('mysql+pymysql://root:test@localhost/', echo=True)
+    create_db.execute("CREATE DATABASE beyond_db")
+    resp['success']=True
+    resp['message']="DB created"
+except Exception as e:
+    resp['message']="Failed to create! %s" % e
+    print resp
 
 try:
     db = create_engine('mysql+pymysql://root:test@localhost/beyond_db', echo=True)
@@ -164,6 +164,7 @@ try:
     resp['message']="hashstags linked"
     resp['success']=True
     print resp
+    
 except Exception as e:
     resp['success']=False
     resp['message']="failed!Reason:%s" % e
