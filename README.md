@@ -13,7 +13,7 @@
 
 1. Change the database information in the following file `gen_data.py`, `main.py`, and in the modules folder `main_objs.py`
 
-2. Change the url variable in `main.js` and `login.js` in the static directory with your `IP`.
+2. Change the `url` variable in `main.js` and `login.js` in the static directory with your `IP`.
 
 3. Run `python gen_data.py`. This will create the database, tables and generate dummy data.
 
@@ -39,3 +39,5 @@
 3. Token table can be improved by adding a check in place to validated the token base on today's date
 
 4. Battle table can be improved by adding a column that supports array where the typo hashtags can be inserted
+
+5. Start and End can be improve by adding a datepicker calendar in the front end
