@@ -3,7 +3,6 @@
 
 from sqlalchemy import *
 import sys, json,random, datetime
-from sqlalchemy.sql import select
 
 resp = {"success":False, "message":None}
 
@@ -52,7 +51,6 @@ try:
                         Column('start_date', Date(), nullable=False),
                         Column('end_date', Date(), nullable=False),
                         Column('winner', String(30), nullable=False),
-                        Column('incorrect_hash_tags', String(500), nullable=False),
                         Column('num_typos', Integer, nullable=False))
 
     # create tables in database

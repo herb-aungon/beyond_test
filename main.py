@@ -100,13 +100,14 @@ def battle_get(user,token_id):
      if token_auth.get('success')==True:
           try:
                battle_init = hash_tag()
-               get_battle = battle_init.get_battle()
-               # if get_battle_.get('success')==True:
-               #      battle = get_battle_.get('data')
-               # else:
-               #      message = json.dumps("Failed: %s" % get_battle_.get('message'))
-               
-               resp = render_template('battle.html', test=get_battle, battle=get_battle.get('data'))
+               get_battle_ = battle_init.get_battle()
+               if get_battle_.get('success')==True:
+                    battle = get_battle_.get('data')
+                    
+               else:
+                    message = json.dumps("Failed to load data: %s" % get_battle_.get('message'))
+                    flash(message)
+               resp = render_template('battle.html', test=get_battle_, battle=battle)
 
           except Exception as e:
                message="Error! %s " % e
@@ -165,9 +166,9 @@ def manage_battle_post(user,token_id):
                payload_json = json.loads(payload)
                start_init = battle()
                start_battle = start_init.start(payload_json)
-               test = json.dumps(start_battle)
+               result = json.dumps(start_battle)
                
-               resp = test #render_template('battle.html', test=test, battle=None)
+               resp = result #render_template('battle.html', test=test, battle=None)
 
           except Exception as e:
                resp="Error! %s " % e
@@ -183,11 +184,56 @@ def manage_battle_post(user,token_id):
 
 @app.route("/home/<user>/<token_id>/battle/manage", methods = [ 'PUT' ] )
 def manage_battle_put(user,token_id):
-     return ''
+     token_init = token()
+     token_auth = token_init.token_validator(token_id)
+     if token_auth.get('success')==True:
+          try:
+               payload = request.data
+               payload_json = json.loads(payload)
+               update_init = battle()
+               update_battle = update_init.update(payload_json)
+               result = json.dumps(update_battle)
+               
+               resp = result #render_template('battle.html', test=test, battle=None)
+
+          except Exception as e:
+               resp="Error! %s " % e
+     else:
+          if token_auth.get('message')==None:
+               message = json.dumps("Token is not recognised!Please Log out!Reason:%s" % token_auth.get('message'))
+          else:
+               message = json.dumps("Failed!Please Log out!Reason: %s" % token_auth.get('message'))
+          #resp = redirect(url_for('login_get'))
+          resp=message
+          flash(message)
+     return resp
+
 
 @app.route("/home/<user>/<token_id>/battle/manage", methods = [ 'DELETE' ] )
 def manage_battle_del(user,token_id):
-     return ''
+     token_init = token()
+     token_auth = token_init.token_validator(token_id)
+     if token_auth.get('success')==True:
+          try:
+               payload = request.data
+               payload_json = json.loads(payload)
+               del_init = battle()
+               del_battle = del_init.delete_(payload_json)
+               result = json.dumps(del_battle)
+               
+               resp = result #render_template('battle.html', test=test, battle=None)
+
+          except Exception as e:
+               resp="Error! %s " % e
+     else:
+          if token_auth.get('message')==None:
+               message = json.dumps("Token is not recognised!Please Log out!Reason:%s" % token_auth.get('message'))
+          else:
+               message = json.dumps("Failed!Please Log out!Reason: %s" % token_auth.get('message'))
+          #resp = redirect(url_for('login_get'))
+          resp=message
+          flash(message)
+     return resp
 
 
 @app.route("/home/<user>/<token_id>/battle/manage", methods = [ 'OPTIONS' ] )

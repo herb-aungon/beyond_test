@@ -19,6 +19,8 @@
 	  {% endfor %}
 	  {% endif %}
 	  {% endwith %}
+
+
 	  <form class="form-inline" role="form">
 	    <legend>Create Hash Tag Battle</legend>
 	    <div class="form-group">
@@ -27,14 +29,16 @@
 	    </div>
 	    <div class="form-group">
 	      <label class="sr-only" for="input_start">Start Date</label>
-	      <input type="text" class="form-control" id="start" placeholder="start_date yy/mm/dd" style="text-transform:lowercase;" />
+	      <input type="text" class="form-control" id="start" placeholder="start_date yyyy-mm-dd" style="text-transform:lowercase;" />
 	    </div>
 	    <div class="form-group">
 	      <label class="sr-only" for="input_end">End Date</label>
-	      <input type="text" class="form-control" id="end" placeholder="end_date yy/mm/dd" style="text-transform:lowercase;" />
+	      <input type="text" class="form-control" id="end" placeholder="end_date yyyy-mm-dd" style="text-transform:lowercase;" />
 	    </div><br>
 	    <br>
-	    <button id="input_submit" name="input_submit" class="btn btn-success">Create Battle</button>
+	    <span class="group-btn">
+	      <a href="#" class="btn btn-success btn-md" id="create">Create Battle</a>
+	    </span>
 	  </form>
 	  
 	  <h2>Hash Tags</h2>

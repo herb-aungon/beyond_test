@@ -114,109 +114,48 @@ class hash_tag():
                                 Column('start_date', Date(), nullable=False),
                                 Column('end_date', Date(), nullable=False),
                                 Column('winner', String(30), nullable=False),
-                                Column('incorrect_hash_tags', String(500), nullable=False),
                                 Column('num_typos', String(30), nullable=False))
 
         self.__d = enchant.Dict("en_US")
+        
     def get_battle(self):
         try:
+            battle="""SELECT * 
+            FROM battle"""
+                
+            get = self.__db.execute( text ( battle ) )
+            battle_list = list(get)
             
-            find_user = select([self.__admin_table])
-            r = self.__connection.execute(find_user)
-            user_list = list(r)
-            hash_tags_init = hash_tag()
-            get_hash_tag = hash_tags_init.get()
-                    
-            c = 0
-            data = []
-            typos = []
-            num_typo = 0
-            num_correct = 0
-            users = {}
-            user_1=0
-            user_2=0
-            user_1_typo=[]
-            user_2_typo=[]
-            
-            while c < len(get_hash_tag.get('data')):
-                d=get_hash_tag.get('data')
-                tag = d[c].get('hash_tag')
-                tag_frag = tag.split('#')
-                check = self.__d.check(tag_frag[-1])
-                user = d[c].get('user')
-                user_list = list(users.values())
-                users.update({user:user})
-                if check == False:
-                    num_typo += 1
-                    typos.append({ 'hash_tag':tag_frag[-1], 'date':d[c].get('date'), 'user':user } )
-                    if users.get('admin_1')==user:
-                        user_1+=1
-                    else:
-                        user_2+=1
-
-                c += 1
-
-            d ={'user_1_num_typo':user_1,'user_2_num_typo':user_2 }
             self.__result['message']="Hash tags Found"
             self.__result['success']=True
-            self.__result['data']=d#len(list(users.values()))
+            self.__result['data']=battle_list
         except Exception as e:
             self.__result['message']="Failed!Reason:%s" % e
         return self.__result
 
 
-
-
-
-
-
-    
     def create(self,data):
         try:
-            # find_user = select([self.__admin_table])
-            # r = self.__connection.execute(find_user)
-            # user_list = list(r)
-            # hash_tags_init = hash_tag()
-            # get_hash_tag = hash_tags_init.get()
-                    
-            # c = 0
-            # typos = []
-            # user_1=0
-            # user_2=0
-            # while c < len(get_hash_tag.get('data')):
-            #     d=get_hash_tag.get('data')
-            #     tag = d[c].get('hash_tag')
-            #     tag_frag = tag.split('#')
-            #     check = self.__d.check(tag_frag[-1])
-            #     user = d[c].get('user')
-            #     user_list = list(users.values())
-            #     users.update({user:user})
-            #     if check == False:
-            #         num_typo += 1
-            #         typos.append({ 'hash_tag':tag_frag[-1], 'date':d[c].get('date'), 'user':user } )
-            #         if users.get('admin_1')==user:
-            #             user_1+=1
-            #         else:
-            #             user_2+=1
+            start = datetime.datetime.strptime(data.get('start'),'%Y-%m-%d')
+            end = datetime.datetime.strptime(data.get('end'),'%Y-%m-%d')
 
-            #     c += 1
-
-            # d ={'user_1_num_typo':user_1,'user_2_num_typo':user_2, 'typos_found':typos }
-            # self.__result['message']="Battle Created"
-            # self.__result['success']=True
-            # self.__result['data']=d#len(list(users.values()))
-
-
-            # insert = self.__battle_table.insert()
-            # new_battle = insert.values(name=data.get('name'), start_date=data.get('start'), end_date=data.get('end') )
+            if start > end:
+                self.__result['message']="Invalid duration for battle. Start date cannot be greater than End date"
+            else:
+                insert = self.__battle_table.insert()
+                new_battle = insert.values(name=data.get('name'), start_date=data.get('start'), end_date=data.get('end') )
             
-            # #establish database connection
-            # insert_statement = self.__connection
-            # #execute insert statement
-            # insert_statement.execute(new_battle)
-
+                #establish database connection
+                insert_statement = self.__connection
+                #execute insert statement
+                insert_statement.execute(new_battle)
+                self.__result['message']="Battle Created. Range from %s-%s" % (str(start),str(end))
+                
+            
         except Exception as e:
-            self.__result['message']="Failed!Reason:%s" % e
+            self.__result['message']="Failed to create battle!Reason:%s" % e
+            
+        return self.__result
 
 
     def get(self):
@@ -259,3 +198,202 @@ class hash_tag():
                 
         return self.__result
             
+class battle():
+    def __init__(self):
+        self.__db = create_engine('mysql+pymysql://root:test@localhost/beyond_db', echo=True)
+        self.__connection = self.__db.connect()
+        self.__result = {'success':False, 'message':None, 'data':None}
+        self.__metadata = MetaData(bind=self.__db)
+        self.__admin_table = Table('admin', self.__metadata,Column('id',Integer, primary_key=True, nullable=False),
+                                   Column('username', String(20), nullable=False),
+                                   Column('password', String(10),nullable=False))
+        self.__admin_hashtags_table = Table('admin_hashtags',self.__metadata,Column('id',Integer, primary_key=True, nullable=False),
+                                            Column('admin_id', Integer, nullable=False),
+                                            Column('hashtag_id', Integer,nullable=False))
+        self.__hashtag_table = Table('hashtag', self.__metadata,Column('id',Integer, primary_key=True, nullable=False),
+                                                                  Column('hashtag', String(30), nullable=False),
+                                                                  Column('date', Date(), nullable=False))
+        self.__battle_table = Table('battle', self.__metadata,Column('id',Integer, primary_key=True, nullable=False),
+                                Column('name', String(50), nullable=False),
+                                Column('start_date', Date(), nullable=False),
+                                Column('end_date', Date(), nullable=False),
+                                Column('winner', String(30), nullable=False),
+                                Column('num_typos', String(30), nullable=False))
+
+        self.__d = enchant.Dict("en_US")
+
+
+
+    def update(self,data):
+        try:
+            start = datetime.datetime.strptime(data.get('start'),'%Y-%m-%d')
+            end = datetime.datetime.strptime(data.get('end'),'%Y-%m-%d')
+
+            if start > end:
+                self.__result['message']="Invalid duration for battle. Start date cannot be greater than End date"
+            else:
+
+                #update battle table
+                update_battle=self.__battle_table.update().\
+                            where(self.__battle_table.c.name == data.get('name') ).\
+                            values(start_date=start, end_date=end) 
+                s = self.__connection.execute(update_battle)
+                
+                self.__result['message']="Battle Details for %s has been Updated" % data.get('name')
+                self.__result['success']=True
+        except Exception as e:
+                self.__result['message']="Unable to update %s!Reason:%s" % (data.get('name'),e)
+                
+        return self.__result
+
+
+
+    def delete_(self,data):
+        try:
+            name = data.get('name')
+            if name==None:
+                self.__result['message']="Unable to delete battle.Please check the name is correct"
+            else:
+                #update battle table
+                delete_battle=self.__battle_table.delete().\
+                            where(self.__battle_table.c.name == name )
+                s = self.__connection.execute(delete_battle)
+                self.__result['message']="Details for %s has been deleted" % name
+                self.__result['success']=True
+        except Exception as e:
+            self.__result['message']="Unable to delete %s!Reason:%s" % (name,e)
+                
+        return self.__result
+
+        
+    def get(self,data):
+        try:
+            find_battle = select([self.__battle_table]).where(self.__battle_table.c.name == data.get('name') )
+            s = self.__connection.execute(find_battle)
+            battle_found = list(s)
+            
+            # r = self.__db.execute( text ( find_battle ) )
+            # battle_found = list(r)
+            self.__result['message']="Battle for %s has been returned" % data.get('name')
+            self.__result['data']=battle_found
+            self.__result['success']=True
+        except Exception as e:
+                self.__result['message']="Unable to find battle for %s!Reason:%s" % (data.get('name'),e)
+                
+        return self.__result
+            
+    def start(self,data):
+        try:
+            get_init = battle()
+            get_battle = get_init.get(data)
+            battle_info = get_battle.get('data')
+            name = battle_info[0][1]
+            start = battle_info[0][2]
+            end = battle_info[0][3]
+            
+            find_hashtag = select([self.__hashtag_table]).where( between(self.__hashtag_table.c.date,start, end ))
+            s = self.__connection.execute(find_hashtag)
+            hashtag_found = list(s)
+            num_hash = len(hashtag_found)
+
+            #stores has tags in dictionary for easy access
+            hash_dict={}
+            hash_counter = 0
+
+            while hash_counter < len(hashtag_found):
+                hash_dict.update( { hashtag_found[hash_counter][0]:hashtag_found[hash_counter][1] } )
+                hash_counter+=1
+            
+            if num_hash==0:
+                self.__result['message']="No hashtags found!Please check daterange"
+            else:
+                #find the admin id
+                user = select([self.__admin_table])
+                find_user = self.__connection.execute(user)
+                user_list = list(find_user)
+                user_1 = {'id':user_list[0][0], 'name':user_list[0][1]}
+                user_2 = {'id':user_list[1][0], 'name':user_list[1][1]}
+                
+                user = select([self.__admin_table])
+                find_user = self.__connection.execute(user)
+                user_list = list(find_user)
+
+                #find tags link with admin
+                user_id = [user_1.get('id'), user_2.get('id')]
+                name=[user_1.get('name'),user_2.get('name')]
+                user_c = 0
+                tags_id=[]
+                user_2_tags_id=[]
+                t = []
+                t2 = []
+                typo_stats = {}
+                typo_stats['hashtags_found']=hash_dict
+                while user_c < len(user_id):
+                    _id = user_id[user_c]
+                    find_link = select([self.__admin_hashtags_table]).where(self.__admin_hashtags_table.c.admin_id==_id)
+                    link = self.__connection.execute(find_link)
+
+                    list_link=list(link)
+                    
+                    #stores the hash tags ids link for the admin
+                    tag_ids =[]
+                    tags_c = 0
+
+                    while tags_c < len(list_link):
+                        tag_ids.append(list_link[tags_c][2])
+                        tags_c+=1
+                        
+                    typo = []
+                    typo_c=0
+
+                    #check for typo
+                    while typo_c < len(tag_ids):
+                        get_hash_val =  hash_dict.get(tag_ids[typo_c])
+                        if get_hash_val != None:
+                            hash_split =get_hash_val.split('#') 
+                            check = self.__d.check(hash_split[-1])
+                            if check == False:
+                                typo.append(hash_split[-1])
+                                t2.append(hash_split[-1])
+                        typo_c+=1
+
+                    typo_stats["%s_typos" % user_list[user_c][1]]=typo
+                    typo_stats["%s_num_typos" % user_list[user_c][1]]=len(typo)
+                    
+                    user_c +=1
+
+                #calculates the winner
+                counter = 0
+                cal_winner = []
+                #calculate the winner
+                while counter < len(user_id):
+                    admin_name =user_list[counter][1]
+                    loc = "%s_num_typos" % admin_name
+
+                    cal_winner.append(typo_stats.get(loc))
+                    #cal_winner.update({admin_name:typo_stats.get(loc)})
+                    counter +=1
+                if counter == len(user_id):
+                    winner = min(cal_winner)
+                #grabs the name of the winner
+                name_winner_raw = list(typo_stats.keys())[list(typo_stats.values()).index(winner)]
+                name_winner_frag = name_winner_raw.split('_')
+                name_winner ="%s_%s" %(name_winner_frag[0], name_winner_frag[1])
+                typo_stats["winner"]=name_winner
+
+                typos_update ="%s_typos" % (name_winner)#ypo_stats.get("%s_typos") % (name_winner)
+
+                #update battle table
+                update_battle=self.__battle_table.update().\
+                               where(self.__battle_table.c.name == data.get('name') ).\
+                               values(winner=name_winner, num_typos=winner) #incorrect_hash_tags = tuple(typo_stats.get(typos_update)), 
+                s = self.__connection.execute(update_battle)
+
+                self.__result['s']=typos_update                
+                self.__result['success']=True
+                self.__result['message']="Battle Started and Finished"
+                self.__result['data']=typo_stats
+        except Exception as e:
+                self.__result['message']="Failed to start battle!Reason:%s" % e
+                
+        return self.__result
