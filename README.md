@@ -19,7 +19,7 @@
 
 4. Run `pyhton main.py`
 
-5. In your Browser, type the following address `http://localhost:5000/beyond_login` or `your_ip/beyond_login`. The website is currently running live (http://herbportal.ddns.net/beyond_login)
+5. In your Browser, type the following address `http://localhost:5000/beyond_login` or `your_ip/beyond_login`. This is currently running live (http://herbportal.ddns.net/beyond_login)
 
 6. The login page should be loaded properly. If there are some problems check that the step 1-3 is completed properly.
 
