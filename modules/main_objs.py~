@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
+
+class user():
+    def __init__(self, db):
+        self.__db = db
+        self.__result = {'sucess':False, 'message':None, 'data':None}
+
+        try:
+            self.__metadata = MetaData(bind=db)
+            
+            self.__admin_table = Table('admin', self.__metadata,Column('id',Integer, primary_key=True, nullable=False),
+                                Column('username', String(20), nullable=False),
+                                Column('password', String(10),nullable=False))
+                    
+            self.__token_table = Table('token', self.__metadata,Column('id',Integer, primary_key=True, nullable=False),
+                                Column('admin_id', Integer, nullable=False))
+
+        except Exception as e:
+            self.__result['message']="Failed!Reason: %s" % e
+            return self.__result
+
+    def check(self,data):
+        s = select([admin_table]).where(admin_table.c.username == data.get('username'))
+        result = connection.execute(s)
+        self.__result['message']="sucess"
+        self.__result['data']=result
+        return self.__result

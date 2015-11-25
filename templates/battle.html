@@ -1,0 +1,45 @@
+{% extends "home.html" %}
+{% block battle %}
+   {{ super() }}
+
+	  <textarea rows="4" cols="50">
+	    {{ hash_tags }}
+	  </textarea>
+
+	  <textarea rows="4" cols="50">
+	    {{ test }}
+	  </textarea>
+	  {% with messages = get_flashed_messages() %}
+	  {% if messages %}
+	  {% for message in messages %}
+	  <div class="alert alert-danger">
+	    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+	    <strong> <a>{{ message }}</a></strong>
+	  </div>
+	  {% endfor %}
+	  {% endif %}
+	  {% endwith %}
+	  
+	  <!-- <h2>Hash Tags</h2> -->
+	  <!-- {% if hash_tags %} -->
+	  <!-- <table id="hash" class="table table-hover" > -->
+	  <!--   <thead> -->
+	  <!--     <tr> -->
+	  <!-- 	<th>HashTags</th> -->
+	  <!-- 	<th>Date</th> -->
+	  <!-- 	<th>Tweet Tagged to:</th> -->
+	  <!--     </tr> -->
+	  <!--   </thead> -->
+	  <!--   <tbody> -->
+	  <!--     {% for i in hash_tags %} -->
+	  <!--     <tr> -->
+	  <!--       <td>{{ i.hash_tag }}</td> -->
+	  <!--       <td  >{{ i.date }}</td> -->
+	  <!-- 	<td  >{{ i.user }}</td> -->
+	  <!--     </tr> -->
+	  <!--     {% endfor %} -->
+	  <!--   </tbody> -->
+	  <!-- </table> -->
+	  <!-- {% endif %} -->
+	  
+{% endblock %}
