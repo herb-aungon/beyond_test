@@ -1,7 +1,7 @@
 # Beyond Test
 
 ###Installation
-*1.install/create virtualenv
+1.install/create virtualenv
 
 2.install the modules(see requirements.txt)
 
