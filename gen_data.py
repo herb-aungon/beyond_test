@@ -39,12 +39,22 @@ try:
                           Column('date', Date(), nullable=False))
 
     admin_hashtags_table = Table('admin_hashtags', metadata,Column('id',Integer, primary_key=True, nullable=False),
-                                 Column('admin_id', Integer, nullable=False), 
-                                 Column('hashtag_id', Integer,nullable=False))
+                            Column('admin_id', Integer, nullable=False), 
+                            Column('hashtag_id', Integer,nullable=False))
 
     token_table = Table('token', metadata,Column('id',Integer, primary_key=True, nullable=False),
-                                 Column('admin_id', Integer, nullable=False))
-    
+                        Column('admin_id', Integer, nullable=False),
+                        Column('date', Date(), nullable=False))
+
+
+    battle_table = Table('battle', metadata,Column('id',Integer, primary_key=True, nullable=False),
+                        Column('name', String(50), nullable=False),
+                        Column('start_date', Date(), nullable=False),
+                        Column('end_date', Date(), nullable=False),
+                        Column('winner', String(30), nullable=False),
+                        Column('incorrect_hash_tags', String(500), nullable=False),
+                        Column('num_typos', Integer, nullable=False))
+
     # create tables in database
     metadata.create_all()
 
